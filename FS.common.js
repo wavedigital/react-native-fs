@@ -616,6 +616,10 @@ var RNFS = {
     return RNFSManager.scanFile(path);
   },
 
+  readInt(filepath: string, length: number = 0, position: number = 0, byteOrder?: string): Promise<number> {
+    return RNFSManager.readInt(normalizeFilePath(filepath), length, position, byteOrder);
+  },
+
   MainBundlePath: RNFSManager.RNFSMainBundlePath,
   CachesDirectoryPath: RNFSManager.RNFSCachesDirectoryPath,
   ExternalCachesDirectoryPath: RNFSManager.RNFSExternalCachesDirectoryPath,

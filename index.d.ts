@@ -281,6 +281,13 @@ export function touch(
 	ctime?: Date
 ): Promise<void>
 
+export function readInt(
+	filepath: string, 
+	length: number = 0, 
+	position: number = 0, 
+	byteOrder?: string
+): Promise<number>
+
 export const MainBundlePath: string
 export const CachesDirectoryPath: string
 export const ExternalCachesDirectoryPath: string

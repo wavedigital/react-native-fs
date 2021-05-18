@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -240,6 +242,27 @@ public class RNFSManager extends ReactContextBaseJavaModule {
       String base64Content = Base64.encodeToString(buffer, 0, bytesRead, Base64.NO_WRAP);
 
       promise.resolve(base64Content);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      reject(promise, filepath, ex);
+    }
+  }
+
+  @ReactMethod
+  public void readInt(String filepath, int length, int position, String byteOrder, Promise promise) {
+    try {
+      if (length != 2 && length != 4) throw new Exception("Invalid length");
+
+      ByteOrder order = byteOrder.equals("LITTLE_ENDIAN") ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+      InputStream inputStream = getInputStream(filepath);
+      byte[] buffer = new byte[length];
+      inputStream.skip(position);
+      int bytesRead = inputStream.read(buffer, 0, length);
+      ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+      byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+      int value = length == 2 ? byteBuffer.getShort() : byteBuffer.getInt();
+      
+      promise.resolve(value);
     } catch (Exception ex) {
       ex.printStackTrace();
       reject(promise, filepath, ex);
