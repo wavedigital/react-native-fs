@@ -251,7 +251,7 @@ public class RNFSManager extends ReactContextBaseJavaModule {
   @ReactMethod
   public void readInt(String filepath, int length, int position, String byteOrder, Promise promise) {
     try {
-      if (length != 2 && length != 4) throw new Exception("Invalid length");
+      if (length != 2 || length != 4) throw new Exception("Invalid length");
 
       ByteOrder order = byteOrder.equals("LITTLE_ENDIAN") ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
       InputStream inputStream = getInputStream(filepath);
