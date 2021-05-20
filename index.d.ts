@@ -288,6 +288,19 @@ export function readInt(
 	byteOrder?: string
 ): Promise<number>
 
+export function readFloat(
+	filepath: string,
+	position: number = 0,
+	byteOrder?: string
+): Promise<number>
+
+export function readFloats(
+	filepath: string,
+	length: number = 0,
+	position: number = 0,
+	byteOrder?: string
+): Promise<number[]>
+
 export const MainBundlePath: string
 export const CachesDirectoryPath: string
 export const ExternalCachesDirectoryPath: string

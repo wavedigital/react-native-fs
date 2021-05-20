@@ -620,6 +620,15 @@ var RNFS = {
     return RNFSManager.readInt(normalizeFilePath(filepath), length, position, byteOrder);
   },
 
+  readFloat(filepath: string, position: number = 0, byteOrder?: string): Promise<number> {
+    return RNFSManager.readFloat(normalizeFilePath(filepath), position, byteOrder);
+  },
+
+  readFloats(filepath: string, length: number, position: number = 0, byteOrder?: string): Promise<number> {
+    return RNFSManager.readFloats(normalizeFilePath(filepath), length, position, byteOrder)
+      .then(values => values.map(value => parseFloat(value)));
+  },
+
   MainBundlePath: RNFSManager.RNFSMainBundlePath,
   CachesDirectoryPath: RNFSManager.RNFSCachesDirectoryPath,
   ExternalCachesDirectoryPath: RNFSManager.RNFSExternalCachesDirectoryPath,

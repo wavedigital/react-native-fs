@@ -251,7 +251,7 @@ public class RNFSManager extends ReactContextBaseJavaModule {
   @ReactMethod
   public void readInt(String filepath, int length, int position, String byteOrder, Promise promise) {
     try {
-      if (length != 2 || length != 4) throw new Exception("Invalid length");
+      if (length != 1 && length != 2 && length != 4) throw new Exception("Invalid length: " + length);
 
       ByteOrder order = byteOrder.equals("LITTLE_ENDIAN") ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
       InputStream inputStream = getInputStream(filepath);
@@ -259,10 +259,63 @@ public class RNFSManager extends ReactContextBaseJavaModule {
       inputStream.skip(position);
       int bytesRead = inputStream.read(buffer, 0, length);
       ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
-      byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-      int value = length == 2 ? byteBuffer.getShort() : byteBuffer.getInt();
+      byteBuffer.order(order);
+      int value;
+
+      if (length == 1) {
+        value = byteBuffer.get(0);
+      } else if (length == 2) {
+        value = byteBuffer.getShort();
+      } else {
+        value = byteBuffer.getInt();
+      }
       
       promise.resolve(value);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      reject(promise, filepath, ex);
+    }
+  }
+
+  @ReactMethod
+  public void readFloat(String filepath, int position, String byteOrder, Promise promise) {
+    try {
+      ByteOrder order = byteOrder.equals("LITTLE_ENDIAN") ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+      InputStream inputStream = getInputStream(filepath);
+      byte[] buffer = new byte[4];
+      inputStream.skip(position);
+      int bytesRead = inputStream.read(buffer, 0, 4);
+      ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+      byteBuffer.order(order);
+   
+      promise.resolve(byteBuffer.getFloat());
+    } catch (Exception ex) {
+      ex.printStackTrace();
+      reject(promise, filepath, ex);
+    }
+  }
+
+  @ReactMethod
+  public void readFloats(String filepath, int length, int position, String byteOrder, Promise promise) {
+    try {
+      if (length < 4) throw new Exception("Invalid length:" + length);
+
+      ByteOrder order = byteOrder.equals("LITTLE_ENDIAN") ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+      InputStream inputStream = getInputStream(filepath);
+      int noOfFloatsToRead = Math.floorDiv(length, 4);
+
+      byte[] buffer = new byte[length];
+      WritableArray values = Arguments.createArray();
+      inputStream.skip(position);
+      int bytesRead = inputStream.read(buffer, 0, length);
+      ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+      byteBuffer.order(order);
+
+      for (int i = 0; i < noOfFloatsToRead; i++) {
+        values.pushString(String.valueOf(byteBuffer.getFloat(i * 4)));
+      }
+
+      promise.resolve(values);
     } catch (Exception ex) {
       ex.printStackTrace();
       reject(promise, filepath, ex);
